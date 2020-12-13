@@ -15,6 +15,7 @@ ocr = easyocr.Reader(["en"])
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("ocr")
 
+
 @app.get("/")
 async def root():
     return {"message": "Hello World"}
@@ -37,10 +38,23 @@ async def do_ocr(request: Request, file: UploadFile = File(...)):
         #     io.BytesIO(probable_text.encode()), media_type="text/plain"
         # )
 
-    return { "error": "missing file" }
+    return {"error": "missing file"}
+
+
+@app.post("/ocr_form")
+async def do_ocr_form(request: Request, file: UploadFile = File(...)):
+    # form = await request.form()
+    # file = form.get("file", None)
+    if file is not None:
+        # res = ocr.readtext(await file.read())
+        res = ocr.readtext(file.file.read())
+        return [item[1] for item in res]
+
+    return {"error": "missing file"}
 
 
 app.include_router(router)
 if __name__ == "__main__":
     import uvicorn
+
     uvicorn.run(app)
