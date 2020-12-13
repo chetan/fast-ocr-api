@@ -6,3 +6,5 @@ freeze:
 
 test:
 	time curl -v -X POST -F file=@./test/test.jpg  localhost:8000/ocr
+
+.PHONY: test freeze serve
