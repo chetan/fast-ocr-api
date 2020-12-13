@@ -1,12 +1,13 @@
 import io
 import logging
 
-from fastapi import FastAPI, APIRouter, Request
+from fastapi import FastAPI, APIRouter, Request, File, UploadFile
 from fastapi.responses import FileResponse, StreamingResponse
 import easyocr
 
 import PIL
 from PIL import Image, ImageOps
+import numpy
 
 app = FastAPI()
 router = APIRouter()
@@ -21,11 +22,14 @@ async def root():
 
 # @router.post("/ocr")
 @app.post("/ocr")
-async def do_ocr(request: Request):
-    form = await request.form()
-    file = form.get("file", None)
+async def do_ocr(request: Request, file: UploadFile = File(...)):
     if file is not None:
-        res = ocr.readtext(await file.read())
+        # res = ocr.readtext(await file.read())
+        # res = ocr.readtext(file.file)
+        # via pil
+        imgFile = numpy.array(PIL.Image.open(file.file).convert("RGB"))
+        res = ocr.readtext(imgFile)
+
         # return array of strings
         return [item[1] for item in res]
         # probable_text = "\n".join((item[1] for item in res))
